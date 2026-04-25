@@ -1,0 +1,70 @@
+
+# OS / Editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.env.*
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs & runtime
+*.log
+*.out
+*.err
+
+# Database
+*.db
+*.sqlite3
+*.sqlite
+
+# Alembic
+
+alembic/versions/*.pyc
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# FastAPI / Uvicorn
+*.pid
+
+# Environment variables
+.env
+.env.local
+
+# File uploads (PDFs, temp files)
+uploads/
+tmp/
+*.pdf
+
+# Frontend (Lovable export / typical JS)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/.cache/
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Misc
+*.swp
+*.swo
