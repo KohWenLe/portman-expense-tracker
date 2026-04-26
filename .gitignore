@@ -51,7 +51,6 @@ htmlcov/
 # File uploads (PDFs, temp files)
 uploads/
 tmp/
-*.pdf
 
 # Frontend (Lovable export / typical JS)
 frontend/node_modules/
