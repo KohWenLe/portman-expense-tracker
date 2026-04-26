@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import date as today_date
 from app.database import get_db
 from app import models, schemas
-from datetime import date as today_date
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ def list_expenses(
         q = q.filter(models.Expense.category == category)
     if is_claimed is not None:
         q = q.filter(models.Expense.is_claimed == is_claimed)
-    return q.order_by(models.Expense.post_date).all()
+    return q.order_by(models.Expense.date).all()  
 
 @router.put("/expenses/{expense_id}", response_model=schemas.ExpenseOut)
 def update_expense(expense_id: int, payload: schemas.ExpenseUpdate, db: Session = Depends(get_db)):
@@ -49,7 +49,7 @@ def toggle_claim(expense_id: int, is_claimed: bool, db: Session = Depends(get_db
     if not expense:
         raise HTTPException(404, "Expense not found")
     expense.is_claimed   = is_claimed
-    expense.claimed_date = today_date.today() if is_claimed else None  # auto-set/clear
+    expense.claimed_date = today_date.today() if is_claimed else None
     db.commit()
     db.refresh(expense)
     return expense

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict  
 from datetime import date
 from typing import Optional, List
 from app.models import ProjectStatus
@@ -21,6 +21,8 @@ class ProjectUpdate(BaseModel):
     status:       Optional[ProjectStatus] = None
 
 class ProjectOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)  
+
     id:           int
     name:         str
     description:  Optional[str]
@@ -28,8 +30,6 @@ class ProjectOut(BaseModel):
     end_date:     Optional[date]
     total_budget: Optional[float]
     status:       ProjectStatus
-    class Config:
-        from_attributes = True
 
 class ProjectSummary(BaseModel):
     project:           ProjectOut
@@ -38,7 +38,7 @@ class ProjectSummary(BaseModel):
     net_position:      float
     total_claimed:     float
     total_outstanding: float
-    budget_remaining:  Optional[float]   # None if no budget set
+    budget_remaining:  Optional[float] = None
 
 # ── Expense ───────────────────────────────────────────────
 class ExpenseCreate(BaseModel):
@@ -51,8 +51,7 @@ class ExpenseCreate(BaseModel):
     category:         Optional[str]   = None
     notes:            Optional[str]   = None
     source_reference: Optional[str]   = None
-    # FX metadata — only needed for overseas transactions
-    original_currency: Optional[str]   = None
+    original_currency: Optional[str]  = None
     original_amount:   Optional[float] = None
     exchange_rate:     Optional[float] = None
 
@@ -68,6 +67,8 @@ class ExpenseUpdate(BaseModel):
     source_reference: Optional[str]   = None
 
 class ExpenseOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)  
+
     id:               int
     project_id:       int
     date:             date
@@ -84,8 +85,6 @@ class ExpenseOut(BaseModel):
     original_currency: Optional[str]
     original_amount:   Optional[float]
     exchange_rate:     Optional[float]
-    class Config:
-        from_attributes = True
 
 class BulkClaimRequest(BaseModel):
     expense_ids: List[int]
@@ -111,6 +110,8 @@ class IncomeUpdate(BaseModel):
     notes:       Optional[str]   = None
 
 class IncomeOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True) 
+
     id:          int
     project_id:  int
     date:        date
@@ -120,5 +121,3 @@ class IncomeOut(BaseModel):
     currency:    str
     amount_rm:   float
     notes:       Optional[str]
-    class Config:
-        from_attributes = True
