@@ -230,6 +230,7 @@ Drafting API endpoints and test cases
 Iterating on parts of the PDF parsing logic
 Crafting initial prompt for lovable generation
 Adapting the frontend integration layer (store.tsx)
+Generate comprehensive README.md
 
 All outputs were reviewed and adjusted. Key decisions—such as PDF parsing rules, data model completeness, and API design—were validated and refined manually.
 
