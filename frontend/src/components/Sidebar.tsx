@@ -38,7 +38,7 @@ export function Sidebar() {
         ))}
       </nav>
       <div className="px-6 py-4 text-xs text-muted-foreground border-t border-sidebar-border">
-        v1.0 · Mock Data
+        v1.0 · Project Expense and Claim Tracker
       </div>
     </aside>
   );
