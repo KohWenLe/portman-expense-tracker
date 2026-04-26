@@ -72,3 +72,31 @@ def get_project_summary(project_id: int, db: Session = Depends(get_db)):
         total_outstanding=round(total_expenses - total_claimed, 2),
         budget_remaining=budget_remaining,
     )
+
+
+@router.get("/{project_id}/breakdown")
+def get_category_breakdown(project_id: int, db: Session = Depends(get_db)):
+    project = db.get(models.Project, project_id)
+    if not project:
+        raise HTTPException(404, "Project not found")
+
+    rows = db.query(
+        models.Expense.category,
+        models.Expense.is_claimed,
+        func.sum(models.Expense.amount_rm).label("total"),
+    ).filter(
+        models.Expense.project_id == project_id
+    ).group_by(
+        models.Expense.category,
+        models.Expense.is_claimed,
+    ).all()
+
+    breakdown = {}
+    for category, is_claimed, total in rows:
+        cat = category or "Uncategorised"
+        if cat not in breakdown:
+            breakdown[cat] = {"claimed": 0.0, "unclaimed": 0.0}
+        key = "claimed" if is_claimed else "unclaimed"
+        breakdown[cat][key] = round(total or 0, 2)
+
+    return breakdown

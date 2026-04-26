@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict  
-from datetime import date
+from datetime import date as DateType
 from typing import Optional, List
 from app.models import ProjectStatus
 
@@ -7,16 +7,16 @@ from app.models import ProjectStatus
 class ProjectCreate(BaseModel):
     name:         str
     description:  Optional[str]   = None
-    start_date:   Optional[date]  = None
-    end_date:     Optional[date]  = None
+    start_date:   Optional[DateType]  = None
+    end_date:     Optional[DateType]  = None
     total_budget: Optional[float] = None
     status:       ProjectStatus   = ProjectStatus.active
 
 class ProjectUpdate(BaseModel):
     name:         Optional[str]           = None
     description:  Optional[str]           = None
-    start_date:   Optional[date]          = None
-    end_date:     Optional[date]          = None
+    start_date:   Optional[DateType]      = None
+    end_date:     Optional[DateType]      = None
     total_budget: Optional[float]         = None
     status:       Optional[ProjectStatus] = None
 
@@ -26,8 +26,8 @@ class ProjectOut(BaseModel):
     id:           int
     name:         str
     description:  Optional[str]
-    start_date:   Optional[date]
-    end_date:     Optional[date]
+    start_date:   Optional[DateType]
+    end_date:     Optional[DateType]
     total_budget: Optional[float]
     status:       ProjectStatus
 
@@ -42,8 +42,8 @@ class ProjectSummary(BaseModel):
 
 # ── Expense ───────────────────────────────────────────────
 class ExpenseCreate(BaseModel):
-    date:             date
-    trans_date:       Optional[date]  = None
+    date:             DateType
+    trans_date:       Optional[DateType]  = None
     description:      str
     amount:           float = Field(gt=0)
     currency:         str   = "MYR"
@@ -62,7 +62,7 @@ class ExpenseUpdate(BaseModel):
     amount_rm:        Optional[float] = None
     category:         Optional[str]   = None
     is_claimed:       Optional[bool]  = None
-    claimed_date:     Optional[date]  = None
+    claimed_date:     Optional[DateType]  = None
     notes:            Optional[str]   = None
     source_reference: Optional[str]   = None
 
@@ -71,15 +71,15 @@ class ExpenseOut(BaseModel):
 
     id:               int
     project_id:       int
-    date:             date
-    trans_date:       Optional[date]
+    date:             DateType
+    trans_date:       Optional[DateType]
     description:      str
     amount:           float
     currency:         str
     amount_rm:        float
     category:         Optional[str]
     is_claimed:       bool
-    claimed_date:     Optional[date]
+    claimed_date:     Optional[DateType]
     notes:            Optional[str]
     source_reference: Optional[str]
     original_currency: Optional[str]
@@ -92,7 +92,7 @@ class BulkClaimRequest(BaseModel):
 
 # ── Income ────────────────────────────────────────────────
 class IncomeCreate(BaseModel):
-    date:        date
+    date:        DateType
     source:      str
     description: Optional[str]  = None
     amount:      float = Field(gt=0)
@@ -101,7 +101,7 @@ class IncomeCreate(BaseModel):
     notes:       Optional[str]  = None
 
 class IncomeUpdate(BaseModel):
-    date:        Optional[date]  = None
+    date:        Optional[DateType]  = None
     source:      Optional[str]   = None
     description: Optional[str]   = None
     amount:      Optional[float] = None
@@ -114,7 +114,7 @@ class IncomeOut(BaseModel):
 
     id:          int
     project_id:  int
-    date:        date
+    date:        DateType
     source:      str
     description: Optional[str]
     amount:      float

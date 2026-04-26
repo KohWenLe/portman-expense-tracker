@@ -17,7 +17,7 @@ class ConfirmPayload(BaseModel):
 
 
 @router.post("/parse")
-async def parse_pdf(file: UploadFile = File(...)):
+async def parse_pdf(file: UploadFile = File(...), db: Session = Depends(get_db)):
     """
     Step 1 — Upload a PDF, get back parsed transactions for review.
     Nothing is saved to the DB yet.
@@ -29,6 +29,11 @@ async def parse_pdf(file: UploadFile = File(...)):
     if not pdf_bytes:
         raise HTTPException(400, "Uploaded file is empty")
 
+    previous = db.query(models.Expense).filter(
+        models.Expense.source_reference == file.filename
+    ).first()
+    already_imported = previous is not None
+
     try:
         transactions = parse_statement(pdf_bytes)
     except Exception as e:
@@ -38,6 +43,7 @@ async def parse_pdf(file: UploadFile = File(...)):
         "filename":         file.filename,
         "transaction_count": len(transactions),
         "transactions":     transactions,
+        "already_imported": already_imported,
     }
 
 
@@ -57,6 +63,15 @@ def confirm_transactions(payload: ConfirmPayload, db: Session = Depends(get_db))
         # Rename post_date → date if frontend sends post_date
         if "post_date" in data and "date" not in data:
             data["date"] = data.pop("post_date")
+        existing = db.query(models.Expense).filter(
+            models.Expense.project_id == payload.project_id,
+            models.Expense.date == data["date"],
+            models.Expense.description == data["description"],
+            models.Expense.amount_rm == data["amount_rm"],
+        ).first()
+        if existing:
+            continue
+
         data["source_reference"] = payload.source_reference
 
         expense = models.Expense(project_id=payload.project_id, **data)

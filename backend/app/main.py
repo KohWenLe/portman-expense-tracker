@@ -17,6 +17,7 @@ app.add_middleware(
 app.include_router(projects.router,  prefix="/projects",  tags=["projects"])
 app.include_router(expenses.router,  prefix="/projects",  tags=["expenses"])   # ← /projects/{id}/expenses
 app.include_router(income.router,    prefix="/projects",  tags=["income"])     # ← /projects/{id}/income
+app.include_router(statements.router, prefix="/statements", tags=["statements"])
 
 @app.get("/")
 def root():

@@ -2,6 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
 from app.main import app
 from app.database import Base, get_db
 
@@ -26,6 +27,7 @@ def reset_db():
     Base.metadata.drop_all(bind=engine)
 
 client = TestClient(app)
+SAMPLE_PDF = os.path.join(os.path.dirname(__file__), "sample_credit_card_statement.pdf")
 
 
 
@@ -304,3 +306,55 @@ def test_summary_empty_project():
     assert s["total_income"]   == 0.0
     assert s["total_expenses"] == 0.0
     assert s["net_position"]   == 0.0
+
+
+def test_statements_confirm_skips_duplicate_rows():
+    p = create_project()
+    payload = {
+        "project_id": p["id"],
+        "source_reference": "march_2026_statement.pdf",
+        "transactions": [
+            {
+                "date": "2026-03-20",
+                "description": "AWS SERVICES",
+                "amount": 95.20,
+                "currency": "USD",
+                "amount_rm": 449.72,
+                "category": "Software",
+            }
+        ],
+    }
+    r1 = client.post("/statements/confirm", json=payload)
+    assert r1.status_code == 200
+    assert len(r1.json()) == 1
+
+    r2 = client.post("/statements/confirm", json=payload)
+    assert r2.status_code == 200
+    assert len(r2.json()) == 0
+
+
+def test_statements_parse_marks_already_imported():
+    p = create_project()
+    confirm_payload = {
+        "project_id": p["id"],
+        "source_reference": "sample_credit_card_statement.pdf",
+        "transactions": [
+            {
+                "date": "2026-03-20",
+                "description": "AWS SERVICES",
+                "amount": 95.20,
+                "currency": "USD",
+                "amount_rm": 449.72,
+                "category": "Software",
+            }
+        ],
+    }
+    confirm = client.post("/statements/confirm", json=confirm_payload)
+    assert confirm.status_code == 200
+
+    with open(SAMPLE_PDF, "rb") as f:
+        files = {"file": ("sample_credit_card_statement.pdf", f, "application/pdf")}
+        r = client.post("/statements/parse", files=files)
+
+    assert r.status_code == 200
+    assert r.json()["already_imported"] is True
